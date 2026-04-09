@@ -650,7 +650,7 @@
     function confirmClaim() {
       if (!pendingItem) return;
       const priceStr = pendingItem.price ? ` (${pendingItem.price}${pendingItem.qty > 1 ? ' × ' + pendingItem.qty : ''})` : '';
-      const msg = `Hiii Ghina & Dibi! 🍼 I'd like to claim *${pendingItem.name}*${priceStr} from your baby registry. Please let me know the next steps!`;
+      const msg = `Hi Ghina & Dibi! 🍼 I'd like to claim *${pendingItem.name}*${priceStr} from your baby registry. Please let me know where to send the items to!`;
       window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank');
       closeModal();
     }
