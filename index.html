@@ -73,9 +73,13 @@
 
     .card { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.125rem; display: flex; flex-direction: column; transition: border-color .2s, box-shadow .2s; }
     .card:hover { border-color: #D0D8CF; box-shadow: 0 2px 12px rgba(44,40,37,.06); }
-    .card.pre-purchased { border-color: #C8DCC6; background: linear-gradient(135deg, #F4F9F3 0%, var(--warm-white) 100%); }
-    .card.status-claimed { border-color: #E8C8BC; background: linear-gradient(135deg, #FDF5F2 0%, var(--warm-white) 100%); opacity: .9; }
-    .card.status-purchased { border-color: #C8DCC6; background: linear-gradient(135deg, #F4F9F3 0%, var(--warm-white) 100%); opacity: .9; }
+    .card.pre-purchased { border-color: #6A9E66; border-width: 1.5px; background: #EAF4E8; }
+    .card.pre-purchased .item-name { color: #4A7A47; }
+    .card.pre-purchased .item-price, .card.pre-purchased .item-qty { color: #5A8A57; }
+    .card.status-claimed { border-color: #C4885A; border-width: 1.5px; background: #FBF0E8; opacity: .92; }
+    .card.status-claimed .item-name { color: #8B5E38; }
+    .card.status-purchased { border-color: #6A9E66; border-width: 1.5px; background: #EAF4E8; opacity: .92; }
+    .card.status-purchased .item-name { color: #4A7A47; }
     .card.no-price { opacity: .72; }
 
     .item-name { font-family: 'Lora', serif; font-size: 14px; font-weight: 400; color: var(--ink); line-height: 1.4; margin-bottom: 4px; }
@@ -90,8 +94,8 @@
     .item-link:hover { color: var(--sage); text-decoration: underline; }
 
     .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; border-radius: 100px; padding: 4px 10px; width: fit-content; }
-    .badge-purchased { background: var(--sage-light); color: var(--sage-dark); border: 1px solid #C8DCC6; }
-    .badge-claimed { background: #FDF0EB; color: #8B5E52; border: 1px solid #E8C8BC; }
+    .badge-purchased { background: #4A7A47; color: #fff; border: 1px solid #3A6A37; font-weight: 500; }
+    .badge-claimed { background: #B8702A; color: #fff; border: 1px solid #A0601A; font-weight: 500; }
 
     .claim-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 7px 13px; border-radius: var(--radius-sm); border: 1.5px solid var(--wa-green); background: transparent; color: var(--wa-green-dark); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; width: fit-content; }
     .claim-btn:hover { background: var(--wa-green); color: #fff; }
@@ -339,17 +343,19 @@
   // --- Data ---
   const ITEMS = [
     // WARDROBE
-    {id:1,cat:"Wardrobe",name:"Fluffy Newborn Set (27pcs)",t:"before",qty:1,price:"Rp567,000",desc:"Set newborn lengkap (any colour)",links:[{label:"Shopee",url:"https://shopee.co.id/FLUFFY-Paket-Baju-Bayi-Setelan-Newborn-Neci-PNBN-Isi-27-Pcs-%E2%80%93-Lembut-Standart-SNI-i.52587699.6888353659"}],pre:false},
+    {id:1,cat:"Wardrobe",name:"Fluffy Newborn Set (24pcs)",t:"before",qty:1,price:"Rp480,000",desc:"FLUFFY SET HIJAU 24PCS",links:[{label:"Shopee",url:"https://shopee.co.id/FLUFFY-ORIGINAL-STAR-PAKET-BAJU-NECI-DAN-CELANA-BAYI-LENGKAP-24-atau-27-PCS-Fluffy-Baby-SNI-i.30017967.27626519233"}],pre:false},
     {id:2,cat:"Wardrobe",name:"Onesies (no leg)",t:"before",qty:5,price:"Rp295,000",desc:"KIKI PUP Long Sleeve Bodysuit (Sz NB)",links:[{label:"Shopee",url:"https://shopee.co.id/product/164954224/25161400240"}],pre:true},
     {id:3,cat:"Wardrobe",name:"Rompers / Playsuit (with leg)",t:"before",qty:5,price:"Rp315,000",desc:"Nice Kids Colorful Printed Playsuit (0–6 bulan)",links:[{label:"Shopee",url:"https://shopee.co.id/product/120363590/23046065847"}],pre:true},
     {id:4,cat:"Wardrobe",name:"Sleepsuit (long leg)",t:"before",qty:7,price:"Rp623,000",desc:"Nice Kids Colorful Printed Sleepsuit (0–6 bulan)",links:[{label:"Shopee",url:"https://shopee.co.id/MemoryLife-Little-Dreamers-Series-Dreamland-Sleepsuit-Sleepsuit-Bayi-Unisex-Premium-Umur-NB-24-Bulan-i.371361283.26363587351"}],pre:true},
     {id:5,cat:"Wardrobe",name:"Sleepsacks / Bedong Instant",t:"before",qty:3,price:"Rp447,000",desc:"Little Palmerhaus Instant Swaddle / BabyLoop Bamboo Cotton",links:[{label:"Option 1 — Shopee",url:"https://id.shp.ee/HkLKJbRc"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/Bedong-Instan-Sleepsack-Bamboo-Cotton-Infant-Baby-Loop-i.32554606.24070522860"}],pre:true},
     {id:6,cat:"Wardrobe",name:"Swaddle Cloth",t:"before",qty:4,price:"Rp396,000",desc:"Kain Bedong Bayi Bamboo Cotton Baby Loop",links:[{label:"Shopee",url:"https://shopee.co.id/Kain-Bedong-Bayi-Baby-Swaddle-Bamboo-Cotton-Baby-Loop-i.32554606.14447536506"}],pre:true},
     {id:7,cat:"Wardrobe",name:"Stroller Blanket",t:"wait",qty:1,price:"Rp138,000",desc:"Dialogue Baby On The Go Blanket 6 in 1",links:[{label:"Shopee",url:"https://shopee.co.id/Dialogue-Baby-On-The-Go-Blanket-6-in-1-Function-DFB0044-i.7847980.7659195482"}],pre:false},
+    {id:62,cat:"Wardrobe",name:"Eye Mask",t:"before",qty:1,price:"Rp18,500",desc:"Baby Eyemask",links:[{label:"Shopee",url:"https://shopee.co.id/Cullinan-Kacamata-Jemur-Bayi-Baby-Eyemask-Penutup-Mata-Bayi-CBKS-i.4756994.29770918545"}],pre:false},
     {id:8,cat:"Wardrobe",name:"TENCEL Blanket",t:"before",qty:1,price:"Rp244,000",desc:"Double Sided Blanket TENCEL Modal Super Soft — Baby Loop",links:[{label:"Shopee",url:"https://shopee.co.id/Selimut-Bayi-Anak-Tencel-Double-Sided-Blanket-TENCEL%E2%84%A2-Modal-Super-Soft-Baby-Loop-i.32554606.20890515126"}],pre:false},
     {id:9,cat:"Wardrobe",name:"Gentle Laundry Detergent",t:"before",qty:1,price:"Rp120,700",desc:"Sleek Baby Wash & Soft Set — Laundry Detergent 1200ml & Softener",links:[{label:"Shopee",url:"https://shopee.co.id/Sleek-Baby-Wash-Soft-Set-Laundry-Detergent-1200ml-Softener-i.561870919.27922400876"}],pre:true},
     // BABY NURSERY
     {id:10,cat:"Baby Nursery",name:"Bedside Crib",t:"before",qty:1,price:"Rp1,600,000",desc:"Babyelle BE909 Cloud Baby Bed",links:[{label:"Shopee",url:"https://shopee.co.id/Box-Bayi-Babyelle-Cloud-Bedside-Baby-Crib-Ranjang-Bayi-Baby-Elle-BE-909-Cloud-Pline-BE-968-Tempat-tidur-i.37568482.8383674283"}],pre:false},
+    {id:63,cat:"Baby Nursery",name:"Wedge Pillow",t:"before",qty:1,price:"Rp248,000",desc:"Sloped Pillow Crea Baby + Penyangga Kaki BUNDLE",links:[{label:"Shopee",url:"https://shopee.co.id/Bantal-Bayi-Anti-Gumoh-Miring-Sloped-Pillow-Crea-Baby-Penyangga-Kaki-i.262386003.43929199392"}],pre:false},
     {id:11,cat:"Baby Nursery",name:"Crib Mattress",t:"wait",qty:1,price:"Rp430,000",desc:"Izzii Baby Mattress Latex 85×51×8 cm",links:[{label:"Shopee",url:"https://shopee.co.id/product/814378251/23669721408"}],pre:false},
     {id:12,cat:"Baby Nursery",name:"Crib Sheets Tencel",t:"wait",qty:1,price:"Rp158,500",desc:"Babybee Fine Bed Linen 87×52 cm",links:[{label:"Shopee",url:"https://shopee.co.id/Babybee-Fine-Bed-Linen-All-Size-Sprei-crib-bayi-anak-Semua-ukuran-Sprei-Kasur-Bayi-Anak-Semua-ukuran-Hypoallergenic-Full-Karet-Karet-4-Sisi-i.25700998.1802674036"}],pre:false},
     {id:13,cat:"Baby Nursery",name:"Crib Sheets Waterproof",t:"before",qty:1,price:"Rp138,000",desc:"Sprei Bayi Anti Ompol Alphajoy FLUFFY Bamboo 87×52 cm",links:[{label:"Shopee",url:"https://shopee.co.id/Sprei-Bayi-Anti-Ompol-Alphajoy-FLUFFY-Bamboo-Terry-Waterproof-Fitted-Padded-Sheet-cover-matras-bamboo-lembut-Baby-Crib-Mattress-Protector-Seprai-alas-ompol-seprei-anak-i.17910554.23827879122"}],pre:false},
@@ -364,7 +370,7 @@
     {id:22,cat:"Baby Nursery",name:"Diaper Cream",t:"before",qty:2,price:"Rp250,000",desc:"Sudocream",links:[{label:"Shopee",url:"https://shopee.co.id/Sudocrem-Baby-Care-Cream-Sudocream-60-gram-dan-125-gram-Sudocream-i.184643521.5409584701"}],pre:true},
     {id:23,cat:"Baby Nursery",name:"Nappy Bag (Plastic)",t:"before",qty:2,price:"Rp160,000",desc:"PIKALULA Travel Nappy Bag 200pcs",links:[{label:"Shopee",url:"https://shopee.co.id/(200-Lembar)-PIKALULA-Travel-Nappy-Bag-Plastik-Sampah-Diapers-Plastik-Popok-Biodegradable-i.371729489.40208962712"}],pre:true},
     {id:61,cat:"Baby Nursery",name:"Caddy Bag",t:"before",qty:1,price:"Rp219,500",desc:"FitPac Diaper Bag/Tas Bayi/Caddy Bag - Size XL",links:[{label:"Shopee",url:"https://shopee.co.id/"}],pre:false},
-    {id:24,cat:"Baby Nursery",name:"Diaper Bag",t:"",qty:1,price:"",desc:"",links:[],pre:false},
+    {id:24,cat:"Baby Nursery",name:"Diaper Bag",t:"before",qty:1,price:"Rp1,359,150",desc:"Lassig",links:[],pre:true},
     // BATH ESSENTIALS
     {id:25,cat:"Bath Essentials",name:"Baby Bathtub & Folding Stand",t:"before",qty:1,price:"Rp1,219,000",desc:"Bubble Baby",links:[{label:"Tokopedia",url:"https://www.tokopedia.com/babywise/bubble-cuddle-bath-with-bath-seat-bak-mandi-bayi-white-0d9c2"}],pre:false},
     {id:26,cat:"Bath Essentials",name:"Newborn Kit Toiletries",t:"before",qty:1,price:"Rp389,000",desc:"Moell Newborn Kit",links:[{label:"Shopee",url:"https://shopee.co.id/Moell-Newborn-Kit-Body-Lotion-185gr-Face-Cream-40gr-Calming-Rub-Cream-50gr-Body-Wash-185gr-Shampoo-185gr-Hair-Lotion-100ml-Paket-Newborn-Diformulasikan-Oleh-Dokter-Anak-Kulit-NO-SLS-PARABEN-i.339900241.27387467946"}],pre:false},
@@ -381,7 +387,7 @@
     {id:36,cat:"Feeding Essentials",name:"Nursing Pads",t:"before",qty:1,price:"Rp38,000",desc:"Angel Mommy Pads 50pcs",links:[{label:"Shopee",url:"https://shopee.co.id/Angel-Mommy-Pads-100Pcs-Breast-Pad-ASI-Breastpads-i.769098073.20164059796"}],pre:true},
     {id:37,cat:"Feeding Essentials",name:"Nipple Cream",t:"before",qty:2,price:"",desc:"Lansinoh",links:[{label:"Tokopedia",url:"https://www.tokopedia.com/lansinohid/lansinoh-hpa-lanolin-for-sore-nipples-cream-40ml-krim-puting-lecet-1729983079000606960"}],pre:true},
     {id:38,cat:"Feeding Essentials",name:"High Chair",t:"wait",qty:1,price:"",desc:"Wait until 6 months",links:[],pre:false},
-    {id:39,cat:"Feeding Essentials",name:"Bibs",t:"before",qty:2,price:"Rp40,000",desc:"Baby Loop / Baby Bear",links:[{label:"Shopee",url:"https://shopee.co.id/Celemek-Bayi-Baby-Bib-Round-Wave-Printed-Bamboo-Cotton-Baby-Loop-i.32554606.25290004044"}],pre:true},
+    {id:39,cat:"Feeding Essentials",name:"Bibs",t:"before",qty:2,price:"Rp40,000",desc:"Baby Loop / Baby Bear",links:[{label:"Option 1 — Baby Loop",url:"https://shopee.co.id/Celemek-Bayi-Baby-Bib-Round-Wave-Printed-Bamboo-Cotton-Baby-Loop-i.32554606.25290004044"},{label:"Option 2 — Baby Bear",url:"https://shopee.co.id/Baby-Bear-Celemek-Bayi-Mpasi-Bayi-Gumoh-Air-Liur-Premium-Lembut-Slabber-Korean-0-3-Tahun-Bib-Bayi-i.1269744768.54651029391"}],pre:true},
     {id:40,cat:"Feeding Essentials",name:"Burp Cloths",t:"before",qty:4,price:"Rp276,000",desc:"Baby Loop / Omiland",links:[{label:"Option 1 — Baby Loop",url:"https://shopee.co.id/Celemek-Bayi-Baby-Burp-Bib-Bamboo-Cotton-Baby-Loop-i.32554606.21908133232"},{label:"Option 2 — Omiland",url:"https://shopee.co.id/Omiland-Tatakan-Pundak-Sendawa-Bayi-Anti-Gumoh-Baby-Burp-Bibs-i.689443372.57505423875"}],pre:true},
     {id:41,cat:"Feeding Essentials",name:"Bottle Sterilizer",t:"before",qty:1,price:"Rp900,000",desc:"Norge 4 in 1 Table Top UV Sterilizer 28L",links:[{label:"Option 1 — Tokopedia",url:"https://www.tokopedia.com/hellobabyofficial/norge-4in1-table-top-uv-sterilizer-dish-dryer-28-l"},{label:"Option 2 — Shopee",url:"https://s.shopee.co.id/5q3QUujWDE"}],pre:false},
     {id:42,cat:"Feeding Essentials",name:"Breast Milk Cooler",t:"wait",qty:1,price:"Rp1,010,000",desc:"Momabae Breast Milk Cooler Portable",links:[{label:"Shopee",url:"https://shopee.co.id/Momabae-Breast-Milk-Cooler-Portable-Termos-Asi-Cooler-Asi-Ice-Gel-Asi-Kulkas-Asi-i.31628700.54153984842"}],pre:false},
@@ -395,12 +401,13 @@
     // GEAR
     {id:49,cat:"Gear",name:"Bugaboo Dragonfly",t:"before",qty:1,price:"Rp6,000,000",desc:"Preloved",links:[],pre:true},
     {id:50,cat:"Gear",name:"Car Seat",t:"before",qty:1,price:"Rp3,499,000",desc:"Joie Chili Spin 360 / Cozy n Safe Comet+ i-Size",links:[{label:"Option 1 — Joie Chili Spin 360",url:"https://www.tokopedia.com/narrababy/carseat-joie-chili-spin-360-rotating-convertible-car-seat-latch-and-vehicle-belt-installation-1731510599423985423"},{label:"Option 2 — Cozy n Safe Comet+",url:"https://shopee.co.id/Cozy-n-Safe-Comet-i-Size-Child-Car-Seat-Graphite-Dudukan-Kursi-Mobil-Bayi-Anak-i.61516207.50900741561"}],pre:false},
-    {id:51,cat:"Gear",name:"Baby Carrier Mini Sling",t:"before",qty:1,price:"Rp699,000",desc:"Mini Monkey Sling",links:[{label:"Tokopedia",url:"https://www.tokopedia.com/sarangbayi/minimonkey-mini-sling-mesh-gendongan-bayi-white"}],pre:false},
+    {id:51,cat:"Gear",name:"Baby Carrier Mini Sling",t:"wait",qty:1,price:"Rp699,000",desc:"Mini Monkey Sling Black",links:[{label:"Shopee",url:"https://shopee.co.id/Mini-Monkey-Mini-Sling-Gendongan-Bayi-Ringan-i.824023.11954219309"}],pre:false},
+    {id:64,cat:"Gear",name:"Baby Carrier Ergobaby",t:"wait",qty:1,price:"Rp3,399,000",desc:"Ergobaby Omni Deluxe / Ergobaby Aerloom",links:[{label:"Option 1 — Omni Deluxe",url:"https://shopee.co.id/Ergobaby-Omni-Deluxe-All-in-One-Mesh-Baby-Carrier-Pearl-Grey-Gendongan-Bayi-i.34286955.24893101138"},{label:"Option 2 — Aerloom",url:"https://shopee.co.id/Ergobaby-Aerloom-Baby-Carrier-i.346049044.44851906575"}],pre:false},
     {id:52,cat:"Gear",name:"Baby Carrier 2",t:"",qty:1,price:"",desc:"Mabe",links:[],pre:false},
     {id:53,cat:"Gear",name:"Baby Swing / Bouncer",t:"",qty:1,price:"",desc:"",links:[],pre:false},
     // PLAYTIME
     {id:54,cat:"Playtime",name:"Sensory Program",t:"good",qty:1,price:"Rp1,708,000",desc:"Learning Time Sensory Program 0–6 bulan",links:[{label:"Shopee",url:"https://shopee.co.id/Learning-Time-Program-Sensory-Mainan-stimulasi-bayi-0-6-bulan-Mainan-Tummy-Time-Bayi-Mainan-newborn-Paket-Stimulasi-bayi-newborn-i.117738746.24539324183"}],pre:false},
-    {id:55,cat:"Playtime",name:"Play Mat",t:"",qty:1,price:"",desc:"",links:[],pre:false},
+    {id:55,cat:"Playtime",name:"Play Mat",t:"",qty:1,price:"Rp159,000",desc:"KISUBO XPE Playmat Fold Motif C Size: 120 x 180 cm",links:[{label:"Shopee",url:"https://shopee.co.id/KISUBO-XPE-Playmat-Fold-and-Roll-New-Series-Playmat-Lipat-dan-Gulung-i.1020394027.22161543884"}],pre:false},
     {id:56,cat:"Playtime",name:"Crib Mobile",t:"",qty:1,price:"",desc:"",links:[],pre:false},
     {id:57,cat:"Playtime",name:"Teething Toys",t:"",qty:1,price:"",desc:"",links:[],pre:false},
     {id:58,cat:"Playtime",name:"Portable Pack and Play",t:"",qty:1,price:"",desc:"",links:[],pre:false},
