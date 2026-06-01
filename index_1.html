@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghina & Dibi's Baby Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --warm-white: #FFFFFF;
+      --sage: #8FAF8C;
+      --sage-light: #E8F0E7;
+      --sage-dark: #5A7A57;
+      --dusty-rose: #C49A8C;
+      --ink: #2C2825;
+      --ink-muted: #6B6460;
+      --ink-faint: #B0ABA7;
+      --border: #E8E2DA;
+      --wa-green: #25D366;
+      --wa-green-dark: #1DAA56;
+      --radius-sm: 6px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+    .hero { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 3.5rem 1.5rem 2.5rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; background: radial-gradient(circle, #E8F0E7 0%, transparent 70%); pointer-events: none; }
+    .hero-eyebrow { font-weight: 300; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--sage-dark); margin-bottom: 1rem; }
+    .hero h1 { font-family: 'Lora', serif; font-size: clamp(26px, 5vw, 40px); font-weight: 400; color: var(--ink); line-height: 1.2; margin-bottom: .5rem; }
+    .hero h1 em { font-style: italic; color: var(--dusty-rose); }
+    .hero-due { font-size: 13px; color: var(--ink-muted); margin-bottom: 1.5rem; font-weight: 300; }
+    .hero-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .hero-pill { background: var(--cream); border: 1px solid var(--border); border-radius: 100px; padding: 6px 16px; font-size: 12px; color: var(--ink-muted); }
+    .hero-pill strong { color: var(--ink); font-weight: 500; }
+
+    .hint-bar { background: var(--sage-light); border-bottom: 1px solid #D0E0CE; padding: 10px 1.5rem; text-align: center; font-size: 12px; color: var(--sage-dark); }
+
+    .admin-bar { background: #FDF8F0; border-bottom: 1px solid #EDE3D0; padding: 8px 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .admin-bar.hidden { display: none; }
+    .admin-mode-badge { font-size: 11px; padding: 3px 10px; background: #FDF0EB; border: 1px solid #C49A8C; border-radius: 100px; color: #8B5E52; font-weight: 500; }
+    .admin-label { font-size: 12px; color: var(--ink-muted); }
+    .admin-exit { font-size: 11px; color: var(--ink-faint); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+
+    .controls { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 14px 1.5rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .search-wrap { position: relative; flex: 1; min-width: 160px; }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--ink-faint); pointer-events: none; }
+    .controls input[type=text] { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 12px 8px 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--cream); color: var(--ink); outline: none; transition: border-color .15s; }
+    .controls input[type=text]:focus { border-color: var(--sage); }
+    .controls input[type=text]::placeholder { color: var(--ink-faint); }
+    .filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .fb { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 6px 13px; border: 1px solid var(--border); border-radius: 100px; background: transparent; color: var(--ink-muted); cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .fb:hover { border-color: var(--sage); color: var(--sage-dark); }
+    .fb.on { background: var(--sage-dark); border-color: var(--sage-dark); color: #fff; }
+
+    .sync-bar { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 6px 1.5rem; text-align: center; font-size: 11px; color: var(--ink-faint); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); display: inline-block; }
+    .sync-dot.syncing { background: #E8A040; animation: pulse 1s infinite; }
+    .sync-dot.ok { background: var(--sage); }
+    .sync-dot.error { background: #C04040; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+    .registry { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+    .cat-section { margin-bottom: 2.5rem; }
+    .cat-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 1rem; padding-bottom: .75rem; border-bottom: 1px solid var(--border); }
+    .cat-icon { font-size: 16px; }
+    .cat-title { font-family: 'Lora', serif; font-size: 17px; font-weight: 400; color: var(--ink); }
+    .cat-count { font-size: 11px; color: var(--ink-faint); margin-left: auto; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+
+    .card { background: var(--warm-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.125rem; display: flex; flex-direction: column; transition: border-color .2s, box-shadow .2s; }
+    .card:hover { border-color: #D0D8CF; box-shadow: 0 2px 12px rgba(44,40,37,.06); }
+    .card.pre-purchased { border-color: #6A9E66; border-width: 1.5px; background: #EAF4E8; }
+    .card.pre-purchased .item-name { color: #4A7A47; }
+    .card.pre-purchased .item-price, .card.pre-purchased .item-qty { color: #5A8A57; }
+    .card.status-claimed { border-color: #C4885A; border-width: 1.5px; background: #FBF0E8; opacity: .92; }
+    .card.status-claimed .item-name { color: #8B5E38; }
+    .card.status-purchased { border-color: #6A9E66; border-width: 1.5px; background: #EAF4E8; opacity: .92; }
+    .card.status-purchased .item-name { color: #4A7A47; }
+    .card.no-price { opacity: .72; }
+
+    .item-name { font-family: 'Lora', serif; font-size: 14px; font-weight: 400; color: var(--ink); line-height: 1.4; margin-bottom: 4px; }
+    .item-desc { font-size: 11.5px; color: var(--ink-muted); line-height: 1.55; margin-bottom: 10px; font-weight: 300; }
+    .item-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
+    .item-price { font-size: 13px; font-weight: 500; color: var(--ink); }
+    .item-qty { font-size: 11px; color: var(--ink-faint); }
+    .item-actions { margin-top: auto; display: flex; flex-direction: column; gap: 7px; }
+    .links-group { display: flex; flex-direction: column; gap: 4px; }
+    .links-label { font-size: 10px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .06em; }
+    .item-link { font-size: 11.5px; color: var(--sage-dark); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; transition: color .15s; }
+    .item-link:hover { color: var(--sage); text-decoration: underline; }
+
+    .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; border-radius: 100px; padding: 4px 10px; width: fit-content; }
+    .badge-purchased { background: #4A7A47; color: #fff; border: 1px solid #3A6A37; font-weight: 500; }
+    .badge-claimed { background: #B8702A; color: #fff; border: 1px solid #A0601A; font-weight: 500; }
+
+    .claim-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 7px 13px; border-radius: var(--radius-sm); border: 1.5px solid var(--wa-green); background: transparent; color: var(--wa-green-dark); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; width: fit-content; }
+    .claim-btn:hover { background: var(--wa-green); color: #fff; }
+    .wa-icon { width: 13px; height: 13px; flex-shrink: 0; }
+
+    .admin-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .mark-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 4px; }
+    .mark-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .mark-claimed-btn { border: 1px solid #C49A8C; color: #8B5E52; background: transparent; }
+    .mark-claimed-btn:hover:not(:disabled) { background: #FDF0EB; }
+    .mark-purchased-btn { border: 1px solid var(--sage); color: var(--sage-dark); background: transparent; }
+    .mark-purchased-btn:hover:not(:disabled) { background: var(--sage-light); }
+    .unmark-btn { border: 1px solid var(--border); color: var(--ink-faint); background: transparent; }
+    .unmark-btn:hover:not(:disabled) { border-color: #aaa; color: var(--ink-muted); }
+
+    .no-results { text-align: center; padding: 4rem 1rem; color: var(--ink-faint); font-size: 14px; font-weight: 300; }
+    footer { border-top: 1px solid var(--border); background: var(--warm-white); padding: 1.5rem; text-align: center; font-size: 12px; color: var(--ink-faint); }
+    footer span { color: var(--dusty-rose); }
+    .admin-link { position: fixed; bottom: 16px; right: 16px; font-size: 11px; color: var(--ink-faint); cursor: pointer; background: var(--warm-white); border: 1px solid var(--border); border-radius: 100px; padding: 5px 12px; transition: all .15s; z-index: 50; }
+    .admin-link:hover { color: var(--ink-muted); border-color: var(--ink-faint); }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,40,37,.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--warm-white); border-radius: var(--radius-xl); padding: 2rem; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(44,40,37,.15); }
+    .modal-icon { font-size: 32px; margin-bottom: 1rem; display: block; }
+    .modal h3 { font-family: 'Lora', serif; font-size: 18px; font-weight: 400; color: var(--ink); margin-bottom: .5rem; }
+    .modal p { font-size: 13px; color: var(--ink-muted); line-height: 1.65; margin-bottom: 1.5rem; font-weight: 300; }
+    .modal-item-name { font-weight: 500; color: var(--ink); }
+    .modal-actions { display: flex; gap: 8px; justify-content: center; }
+    .btn-cancel { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 9px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--ink-muted); cursor: pointer; }
+    .btn-cancel:hover { border-color: var(--ink-faint); }
+    .btn-confirm { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: var(--radius-sm); border: 1.5px solid var(--wa-green); background: var(--wa-green); color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .btn-confirm:hover { background: var(--wa-green-dark); }
+    .admin-modal { max-width: 320px; }
+    .admin-modal input[type=password] { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--cream); color: var(--ink); outline: none; margin-bottom: 1rem; text-align: center; letter-spacing: .1em; }
+    .admin-modal input[type=password]:focus { border-color: var(--dusty-rose); }
+    .btn-admin-login { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 9px 24px; border-radius: var(--radius-sm); border: 1px solid #C49A8C; background: #FDF0EB; color: #8B5E52; cursor: pointer; width: 100%; }
+    .btn-admin-login:hover { background: #F5E0D6; }
+    .admin-error { font-size: 12px; color: #B04040; margin-top: -8px; margin-bottom: 8px; }
+    .hidden { display: none; }
+
+    @media (max-width: 480px) { .hero { padding: 2.5rem 1rem 2rem; } .controls, .admin-bar { padding: 10px 1rem; } .registry { padding: 1.5rem 1rem 2rem; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="hero-eyebrow">Baby Registry</p>
+  <h1>Ghina &amp; <em>Dibi's</em><br>Baby Registry</h1>
+  <p class="hero-due">Estimated due date: End of May / Early June 2026</p>
+  <div class="hero-pills">
+    <div class="hero-pill">Items: <strong id="hv-total">—</strong></div>
+    <div class="hero-pill">Still needed: <strong id="hv-needed">—</strong></div>
+    <div class="hero-pill">Claimed: <strong id="hv-claimed">—</strong></div>
+  </div>
+</header>
+
+<div class="hint-bar">
+  🍼 Want to give a gift? Browse the items below and click <strong>Claim via WhatsApp</strong> to let Ghina &amp; Dibi know!
+</div>
+
+<div class="admin-bar hidden" id="admin-bar">
+  <span class="admin-mode-badge">🔑 Admin mode</span>
+  <span class="admin-label">Click any item to mark it as claimed or purchased</span>
+  <button class="admin-exit" onclick="exitAdmin()">Exit admin</button>
+</div>
+
+<div class="sync-bar" id="sync-bar">
+  <span class="sync-dot" id="sync-dot"></span>
+  <span id="sync-label">Loading status…</span>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="8.5" cy="8.5" r="5.5"/><path d="M13.5 13.5L18 18" stroke-linecap="round"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search items…" oninput="render()">
+  </div>
+  <div class="filter-btns">
+    <button class="fb on" onclick="setF('all',this)">All items</button>
+    <button class="fb" onclick="setF('needed',this)">Still needed</button>
+    <button class="fb" onclick="setF('claimed',this)">Claimed / purchased</button>
+  </div>
+</div>
+
+<main class="registry" id="registry"></main>
+<footer>Made with <span>♥</span> for Ghina &amp; Dibi's little one</footer>
+
+<button class="admin-link" onclick="openAdminModal()" id="admin-link-btn">🔑 Admin</button>
+
+<!-- WA Modal -->
+<div class="modal-overlay" id="modal-wa">
+  <div class="modal">
+    <span class="modal-icon">🍼</span>
+    <h3>Claim this item?</h3>
+    <p>You're about to claim <span class="modal-item-name" id="modal-item-name"></span>.<br><br>Clicking confirm will open WhatsApp with a pre-filled message to Ghina &amp; Dibi.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-wa')">Cancel</button>
+      <button class="btn-confirm" id="btn-wa-confirm">
+        <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Open WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Login Modal -->
+<div class="modal-overlay" id="modal-admin">
+  <div class="modal admin-modal">
+    <span class="modal-icon">🔑</span>
+    <h3>Admin login</h3>
+    <p>Enter the admin password to mark items as claimed or purchased.</p>
+    <input type="password" id="admin-pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')tryAdminLogin()">
+    <p class="admin-error hidden" id="admin-error">Incorrect password. Try again.</p>
+    <button class="btn-admin-login" onclick="tryAdminLogin()">Login</button>
+    <div style="margin-top:12px">
+      <button class="btn-cancel" onclick="closeModal('modal-admin')" style="font-size:12px;padding:6px 16px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WA = '6281286752014';
+  const ADMIN_PASSWORD = 'ghina2026';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybi3EPyFICfK7S9vj-h1W8P0-rTythbG3Kb-_Lvy9ex6q1k45TYXF0dTFggThWvJb0/exec';
+
+  const WA_SVG = `<svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+  let isAdmin = false;
+  let pendingItem = null;
+  let activeF = 'all';
+  let itemStatus = {}; // { [id]: 'claimed' | 'purchased' }
+
+  // --- Sync UI helpers ---
+  function setSyncState(state, msg) {
+    const dot = document.getElementById('sync-dot');
+    const label = document.getElementById('sync-label');
+    dot.className = 'sync-dot' + (state ? ' ' + state : '');
+    label.textContent = msg;
+  }
+
+  // --- Load statuses from Google Sheet ---
+  async function loadStatuses() {
+    setSyncState('syncing', 'Loading status…');
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      itemStatus = data;
+      // Merge in pre-purchased items
+      ITEMS.forEach(item => { if (item.pre) itemStatus[item.id] = 'purchased'; });
+      setSyncState('ok', 'Up to date');
+      render();
+    } catch(e) {
+      setSyncState('error', 'Could not load status — showing offline');
+      ITEMS.forEach(item => { if (item.pre) itemStatus[item.id] = 'purchased'; });
+      render();
+    }
+  }
+
+  // --- Save status to Google Sheet ---
+  async function saveStatus(id, status) {
+    setSyncState('syncing', 'Saving…');
+    try {
+      const params = new URLSearchParams({ action: 'set', id: id, status: status === null ? 'null' : status });
+      await fetch(SCRIPT_URL + '?' + params.toString(), { mode: 'no-cors' });
+      setSyncState('ok', 'Saved');
+    } catch(e) {
+      setSyncState('error', 'Save failed — try again');
+    }
+  }
+
+  // --- Admin ---
+  function openAdminModal() {
+    document.getElementById('admin-pw-input').value = '';
+    document.getElementById('admin-error').classList.add('hidden');
+    openModal('modal-admin');
+    setTimeout(() => document.getElementById('admin-pw-input').focus(), 100);
+  }
+
+  function tryAdminLogin() {
+    if (document.getElementById('admin-pw-input').value === ADMIN_PASSWORD) {
+      isAdmin = true;
+      closeModal('modal-admin');
+      document.getElementById('admin-bar').classList.remove('hidden');
+      document.getElementById('admin-link-btn').style.display = 'none';
+      render();
+    } else {
+      document.getElementById('admin-error').classList.remove('hidden');
+    }
+  }
+
+  function exitAdmin() {
+    isAdmin = false;
+    document.getElementById('admin-bar').classList.add('hidden');
+    document.getElementById('admin-link-btn').style.display = '';
+    render();
+  }
+
+  async function markItem(id, status) {
+    if (!isAdmin) return;
+    const current = itemStatus[id];
+    const newStatus = (current === status) ? null : status;
+    if (newStatus === null) {
+      delete itemStatus[id];
+    } else {
+      itemStatus[id] = newStatus;
+    }
+    render();
+    await saveStatus(id, newStatus);
+  }
+
+  // --- WA Modal ---
+  function openWAModal(id) {
+    const item = ITEMS.find(i => i.id === id);
+    if (!item || item.pre) return;
+    pendingItem = item;
+    const priceStr = item.price ? ` (${item.price}${item.qty > 1 ? ' × ' + item.qty : ''})` : '';
+    document.getElementById('modal-item-name').textContent = item.name + priceStr;
+    openModal('modal-wa');
+    document.getElementById('btn-wa-confirm').onclick = confirmClaim;
+  }
+
+  function confirmClaim() {
+    if (!pendingItem) return;
+    const priceStr = pendingItem.price ? ` (${pendingItem.price}${pendingItem.qty > 1 ? ' × ' + pendingItem.qty : ''})` : '';
+    const msg = `Hi Ghina & Dibi! I'd like to claim *${pendingItem.name}*${priceStr} from your baby registry. Please let me know where to send the items to!`;
+    window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank');
+    closeModal('modal-wa');
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+  });
+
+  function setF(f, btn) {
+    activeF = f;
+    document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    render();
+  }
+
+  // --- Data ---
+  const ITEMS = [
+    // WARDROBE
+    {id:1,cat:"Wardrobe",name:"Fluffy Newborn Set (24pcs)",t:"before",qty:1,price:"Rp242,678",desc:"FLUFFY SET HIJAU 24PCS",links:[{label:"Shopee",url:"https://shopee.co.id/FLUFFY-ORIGINAL-STAR-PAKET-BAJU-NECI-DAN-CELANA-BAYI-LENGKAP-24-atau-27-PCS-Fluffy-Baby-SNI-i.30017967.27626519233"}],pre:true},
+    {id:67,cat:"Wardrobe",name:"Newborn first day set",t:"before",qty:1,price:"Rp151,505",desc:"Mioubaby",links:[],pre:true},
+    {id:2,cat:"Wardrobe",name:"Onesies (no leg)",t:"before",qty:5,price:"Rp295,000",desc:"KIKI PUP Long Sleeve Bodysuit (Sz NB)",links:[{label:"Shopee",url:"https://shopee.co.id/product/164954224/25161400240"}],pre:true},
+    {id:3,cat:"Wardrobe",name:"Rompers / Playsuit (with leg)",t:"before",qty:5,price:"Rp315,000",desc:"Nice Kids Colorful Printed Playsuit (0-6 bulan)",links:[{label:"Shopee",url:"https://shopee.co.id/product/120363590/23046065847"}],pre:true},
+    {id:4,cat:"Wardrobe",name:"Sleepsuit (long leg)",t:"before",qty:7,price:"Rp623,000",desc:"Nice Kids Colorful Printed Sleepsuit (0-6 bulan)",links:[{label:"Shopee",url:"https://shopee.co.id/MemoryLife-Little-Dreamers-Series-Dreamland-Sleepsuit-Sleepsuit-Bayi-Unisex-Premium-Umur-NB-24-Bulan-i.371361283.26363587351"}],pre:true},
+    {id:5,cat:"Wardrobe",name:"Sleepsacks / Bedong Instant",t:"before",qty:3,price:"Rp447,000",desc:"Little Palmerhaus Instant Swaddle / BabyLoop Bamboo Cotton",links:[{label:"Option 1 — Shopee",url:"https://id.shp.ee/HkLKJbRc"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/Bedong-Instan-Sleepsack-Bamboo-Cotton-Infant-Baby-Loop-i.32554606.24070522860"}],pre:true},
+    {id:6,cat:"Wardrobe",name:"Swaddle Cloth",t:"before",qty:4,price:"Rp396,000",desc:"Kain Bedong Bayi Baby Swaddle Bamboo Cotton Baby Loop",links:[{label:"Shopee",url:"https://shopee.co.id/Kain-Bedong-Bayi-Baby-Swaddle-Bamboo-Cotton-Baby-Loop-i.32554606.14447536506"}],pre:true},
+    {id:7,cat:"Wardrobe",name:"Stroller blankets",t:"before",qty:1,price:"Rp170,300",desc:"Dialogue Baby On The Go Blanket 6 in 1 Function",links:[{label:"Shopee",url:"https://shopee.co.id/Dialogue-Baby-On-The-Go-Blanket-6-in-1-Function-DFB0044-i.7847980.7659195482"}],pre:true},
+    {id:62,cat:"Wardrobe",name:"Eye Mask",t:"before",qty:1,price:"Rp14,400",desc:"Baby Eyemask",links:[{label:"Shopee",url:"https://shopee.co.id/Cullinan-Kacamata-Jemur-Bayi-Baby-Eyemask-Penutup-Mata-Bayi-CBKS-i.4756994.29770918545"}],pre:true},
+    {id:8,cat:"Wardrobe",name:"TENCEL Blanket",t:"wait",qty:1,price:"Rp244,000",desc:"Double Sided Blanket TENCEL Modal Super Soft - Baby Loop",links:[{label:"Shopee",url:"https://shopee.co.id/Selimut-Bayi-Anak-Tencel-Double-Sided-Blanket-TENCEL%E2%84%A2-Modal-Super-Soft-Baby-Loop-i.32554606.20890515126"}],pre:true},
+    {id:9,cat:"Wardrobe",name:"Gentle laundry detergent",t:"before",qty:1,price:"Rp115,972",desc:"Sleek Baby Wash & Soft Set - Laundry Detergent 1200ml & Softener",links:[{label:"Shopee",url:"https://shopee.co.id/Sleek-Baby-Wash-Soft-Set-Laundry-Detergent-1200ml-Softener-i.561870919.27922400876"}],pre:true},
+    // BABY NURSERY
+    {id:10,cat:"Baby Nursery",name:"Bedside Crib",t:"before",qty:1,price:"Rp1,600,000",desc:"Babyelle BE909 Cloud Baby Bed",links:[{label:"Shopee",url:"https://shopee.co.id/Box-Bayi-Babyelle-Cloud-Bedside-Baby-Crib-Ranjang-Bayi-Baby-Elle-BE-909-Cloud-Pline-BE-968-Tempat-tidur-i.37568482.8383674283"}],pre:true},
+    {id:63,cat:"Baby Nursery",name:"Wedge Pillow",t:"wait",qty:1,price:"Rp248,000",desc:"Sloped Pillow Crea Baby + Penyangga Kaki BUNDLE",links:[{label:"Shopee",url:"https://shopee.co.id/Bantal-Bayi-Anti-Gumoh-Miring-Sloped-Pillow-Crea-Baby-Penyangga-Kaki-i.262386003.43929199392"}],pre:true},
+    {id:11,cat:"Baby Nursery",name:"Crib mattress",t:"wait",qty:1,price:"Rp438,000",desc:"Izzii Baby Mattress Latex 85x51x8 cm",links:[{label:"Shopee",url:"https://shopee.co.id/product/814378251/23669721408"}],pre:true},
+    {id:12,cat:"Baby Nursery",name:"Crib Sheets Tencel",t:"wait",qty:1,price:"Rp158,500",desc:"Babybee Fine Bed Linen 87x52 cm",links:[{label:"Shopee",url:"https://shopee.co.id/Babybee-Fine-Bed-Linen-All-Size-Sprei-crib-bayi-anak-Semua-ukuran-Sprei-Kasur-Bayi-Anak-Semua-ukuran-Hypoallergenic-Full-Karet-Karet-4-Sisi-i.25700998.1802674036"}],pre:false},
+    {id:13,cat:"Baby Nursery",name:"Crib Sheets Waterproof",t:"before",qty:1,price:"Rp123,000",desc:"Sprei Bayi Anti Ompol Alphajoy FLUFFY Bamboo 87x52 cm",links:[{label:"Shopee",url:"https://shopee.co.id/Sprei-Bayi-Anti-Ompol-Alphajoy-FLUFFY-Bamboo-Terry-Waterproof-Fitted-Padded-Sheet-cover-matras-bamboo-lembut-Baby-Crib-Mattress-Protector-Seprai-alas-ompol-seprei-anak-i.17910554.23827879122"}],pre:true},
+    {id:14,cat:"Baby Nursery",name:"Portable Baby Nest",t:"good",qty:1,price:"Rp409,000",desc:"Foxandbunny - Baby Nest Newborn 3 in 1",links:[{label:"Shopee",url:"https://shopee.co.id/Foxandbunny-Baby-Nest-Newborn-3-in-1-Baby-Nest-Kasur-Bayi-Alas-Tidur-Bayi-Nyaman-Empuk-dan-Lembut-Premium-i.9154240.52755842354"}],pre:true},
+    {id:16,cat:"Baby Nursery",name:"Baby monitor",t:"good",qty:1,price:"Rp1,500,000",desc:"KURU BMC8 5.0" Smart Video" Smart Video",links:[{label:"Shopee",url:"https://shopee.co.id/KURU-BMC8-5.0-Smart-Video-Audio-Wi-Fi-Baby-Monitor-360-PTZ-Rotation-with-Tuya-Apps-i.26896492.27302858773"}],pre:true},
+    {id:17,cat:"Baby Nursery",name:"Diaper Changing Table",t:"before",qty:1,price:"Rp365,000",desc:"Portable changing table",links:[{label:"Shopee",url:"https://shopee.co.id/Baby-Diaper-Changing-Table-Foldable-Newborn-0-3-Years-Old-Care-Diaper-Nursing-Table-i.1384399310.29269049827"}],pre:true},
+    {id:18,cat:"Baby Nursery",name:"Changing Mat (Perlak)",t:"before",qty:2,price:"Rp170,000",desc:"Baby Bear Perlak Bayi Waterproof 50x70",links:[{label:"Shopee",url:"https://shopee.co.id/Baby-Bear-%E2%80%8B%E2%80%8BPerlak-Bayi-Waterproof-Katun-Washable-Reusable-Alas-Ompol-Absorbent-Baby-Changing-Pads-i.1269744768.43654023986"}],pre:true},
+    {id:19,cat:"Baby Nursery",name:"White noise machine",t:"good",qty:1,price:"Rp339,000",desc:"KURU W16 Baby White Noise Sound Machine",links:[{label:"Shopee",url:"https://shopee.co.id/KURU-W16-Baby-White-Noise-Sound-Machine-Shusher-with-LED-Night-Lamp-i.192652608.16998585773"}],pre:false},
+    {id:20,cat:"Baby Nursery",name:"Disposable newborn-size diapers",t:"before",qty:1,price:"Rp107,500",desc:"Mamypoko Royal Soft NB 84 pcs",links:[{label:"Tokopedia",url:"https://www.tokopedia.com/mamypokoofficial/mamypoko-perekat-royal-soft-organic-popok-perekat-nb-84-1733362839774856898"}],pre:true},
+    {id:21,cat:"Baby Nursery",name:"Unscented baby wipes (non alcohol)",t:"before",qty:1,price:"Rp99,225",desc:"Mamiko Wet Tissue Pure Water 80x6",links:[{label:"Shopee",url:"https://shopee.co.id/Mamiko-Wet-Tissue-Baby-Wipes-Pure-Water-Hand-Mouth-80s-(6-Pack)-Tisu-Basah-Bayi-i.735210860.24157224462"}],pre:true},
+    {id:68,cat:"Baby Nursery",name:"Cottonball",t:"before",qty:5,price:"Rp47,500",desc:"",links:[],pre:true},
+    {id:69,cat:"Baby Nursery",name:"Mouth Cleaner",t:"before",qty:2,price:"Rp57,400",desc:"",links:[],pre:true},
+    {id:70,cat:"Baby Nursery",name:"Multisurface Cleaner",t:"before",qty:1,price:"Rp49,000",desc:"",links:[],pre:true},
+    {id:22,cat:"Baby Nursery",name:"Diaper cream",t:"before",qty:2,price:"Rp250,000",desc:"Sudocream",links:[{label:"Shopee",url:"https://shopee.co.id/Sudocrem-Baby-Care-Cream-Sudocream-60-gram-dan-125-gram-Sudocream-i.184643521.5409584701"}],pre:true},
+    {id:23,cat:"Baby Nursery",name:"Nappy bag (plastic)",t:"before",qty:2,price:"Rp160,000",desc:"PIKALULA Travel Nappy Bag 200pcs",links:[{label:"Shopee",url:"https://shopee.co.id/(200-Lembar)-PIKALULA-Travel-Nappy-Bag-Plastik-Sampah-Diapers-Plastik-Popok-Biodegradable-i.371729489.40208962712"}],pre:false},
+    {id:61,cat:"Baby Nursery",name:"Caddy Bag",t:"before",qty:1,price:"Rp219,500",desc:"FitPac Diaper Bag/Tas Bayi/Caddy Bag - Size XL",links:[{label:"Shopee",url:"https://shopee.co.id/FitPac-Diaper-Bag-Tas-Bayi-Caddy-Bag-Size-XL-DiaperPac-XL-i.181030829.22169132316"}],pre:true},
+    {id:24,cat:"Baby Nursery",name:"Diaper bag",t:"before",qty:1,price:"Rp1,359,150",desc:"Lassig",links:[],pre:true},
+    {id:71,cat:"Bath Essentials",name:"IKEA Lattsam + Rack + kursi",t:"before",qty:1,price:"Rp348,500",desc:"",links:[{label:"Tokopedia",url:"https://www.tokopedia.com/babywise/bubble-cuddle-bath-with-bath-seat-bak-mandi-bayi-white-0d9c2"}],pre:true},
+    {id:72,cat:"Bath Essentials",name:"Washbasin (Ember)",t:"before",qty:1,price:"Rp29,500",desc:"",links:[],pre:true},
+    // BATH ESSENTIALS
+    {id:26,cat:"Bath Essentials",name:"Newborn Kit Toiletries",t:"before",qty:1,price:"Rp333,000",desc:"Moell Newborn Kit",links:[{label:"Shopee",url:"https://shopee.co.id/Moell-Newborn-Kit-Body-Lotion-185gr-Face-Cream-40gr-Calming-Rub-Cream-50gr-Body-Wash-185gr-Shampoo-185gr-Hair-Lotion-100ml-Paket-Newborn-Diformulasikan-Oleh-Dokter-Anak-Kulit-NO-SLS-PARABEN-i.339900241.27387467946"}],pre:true},
+    {id:28,cat:"Bath Essentials",name:"Bamboo Towel",t:"before",qty:2,price:"Rp158,000",desc:"KUMA KUMA Bamboo Towel 60x120cm",links:[{label:"Shopee",url:"https://shopee.co.id/KUMA-KUMA-Bamboo-Towel-(60x120cm)-Handuk-Newborn-Premium-Quality-i.30048535.22349370348"}],pre:true},
+    {id:29,cat:"Bath Essentials",name:"Soft washcloths",t:"before",qty:1,price:"Rp44,700",desc:"MemoryLife Little Croffle Washcloth 3pcs",links:[{label:"Shopee",url:"https://shopee.co.id/MemoryLife-Little-Croffle-Washcloth-Handuk-Mini-3pcs-Handuk-Kecil-Muka-i.371361283.26660681734"}],pre:true},
+    // FEEDING ESSENTIALS
+    {id:30,cat:"Feeding Essentials",name:"Spectra Dual Compact Breastpump",t:"before",qty:1,price:"Rp3,500,000",desc:"",links:[{label:"Shopee",url:"https://shopee.co.id/Spectra-Dual-Compact-Electric-Breast-Pump-Pompa-ASI-i.61516207.9983431970"}],pre:true},
+    {id:73,cat:"Feeding Essentials",name:"MOMCOZY V2 Pro Wearable Breast Pump",t:"good",qty:1,price:"Rp3,349,000",desc:"",links:[{label:"Shopee",url:"https://shopee.co.id/MOMCOZY-V2-Pro-Wearable-Breast-Pump-Pompa-ASI-Wireless-Breastpump-Hospital-Grade-i.1571484506.41556693774"}],pre:false},
+    {id:31,cat:"Feeding Essentials",name:"Bottles and nipples (PPSU)",t:"before",qty:2,price:"Rp226,000",desc:"Philips Avent 150ml PPSU / Dr. Brown's 150ml PPSU (2 bottles each)",links:[{label:"Option 1 — Shopee",url:"https://shopee.co.id/Philips-Avent-PPSU-Natural-Response-Dot-Seperti-Payudara-Ibu-Tahan-Hingga-180%C2%B0C-SCY940-01-SCY940-02-SCY943-01-SCY943-02-i.1213484604.29830158617"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/-BELI-2-LEBIH-HEMAT-Dr.-Brown-s-5oz-9oz-PPSU-Wide-Neck-Options-Deco-Elephant-Lion-Botol-Susu-Botol-Bayi-2-pack-i.27199182.28104926032"}],pre:true},
+    {id:32,cat:"Feeding Essentials",name:"Bottle brush",t:"before",qty:1,price:"Rp33,000",desc:"SUGAR BABY Bottle Brush Set 5in1",links:[{label:"Shopee",url:"https://shopee.co.id/SUGAR-BABY-Bottle-Brush-Set-5in1-Set-Sikat-Botol-Susu-Bayi-Sikat-Botol-Multifungsi-i.136011044.45005906750"}],pre:true},
+    {id:33,cat:"Feeding Essentials",name:"Dishwasher basket",t:"before",qty:1,price:"",desc:"",links:[],pre:true},
+    {id:34,cat:"Feeding Essentials",name:"Milk storage bags",t:"before",qty:1,price:"Rp35,425",desc:"ANGEL MOMMY 90PCS 150ml",links:[{label:"Shopee",url:"https://shopee.co.id/product/1105674106/28651069432"}],pre:true},
+    {id:35,cat:"Feeding Essentials",name:"Silicone Bag",t:"before",qty:2,price:"Rp478,000",desc:"MAVEN LARGE (2000ml)",links:[{label:"Shopee",url:"https://shopee.co.id/MAVEN-LARGE-(2000ML)-Silicone-Bag-Food-Grade-Leakproof-i.333066588.19640545960"}],pre:false},
+    {id:36,cat:"Feeding Essentials",name:"Nursing pads",t:"before",qty:1,price:"Rp56,500",desc:"Angel Mommy Pads 50pcs",links:[{label:"Shopee",url:"https://shopee.co.id/Angel-Mommy-Pads-100Pcs-Breast-Pad-ASI-Breastpads-i.769098073.20164059796"}],pre:true},
+    {id:37,cat:"Feeding Essentials",name:"Nipple cream",t:"before",qty:2,price:"",desc:"Lansinoh",links:[{label:"Tokopedia",url:"https://www.tokopedia.com/lansinohid/lansinoh-hpa-lanolin-for-sore-nipples-cream-40ml-krim-puting-lecet-1729983079000606960"}],pre:true},
+    {id:38,cat:"Feeding Essentials",name:"High chair",t:"wait",qty:,price:"",desc:"Wait until 6 months",links:[],pre:false},
+    {id:39,cat:"Feeding Essentials",name:"Bibs",t:"before",qty:2,price:"Rp34,000",desc:"Baby Loop / Baby Bear",links:[{label:"Option 1 — Shopee",url:"https://shopee.co.id/Celemek-Bayi-Baby-Bib-Round-Wave-Printed-Bamboo-Cotton-Baby-Loop-i.32554606.25290004044"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/Baby-Bear-Celemek-Bayi-Mpasi-Bayi-Gumoh-Air-Liur-Premium-Lembut-Slabber-Korean-0-3-Tahun-Bib-Bayi-i.1269744768.54651029391"}],pre:true},
+    {id:40,cat:"Feeding Essentials",name:"Burp cloths",t:"before",qty:2,price:"Rp54,000",desc:"Baby Loop / Omiland",links:[{label:"Option 1 — Shopee",url:"https://shopee.co.id/Celemek-Bayi-Baby-Burp-Bib-Bamboo-Cotton-Baby-Loop-i.32554606.21908133232"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/Omiland-Tatakan-Pundak-Sendawa-Bayi-Anti-Gumoh-Baby-Burp-Bibs-i.689443372.57505423875"}],pre:true},
+    {id:65,cat:"Feeding Essentials",name:"Baby feeding pillow",t:"before",qty:,price:"",desc:"",links:[],pre:true},
+    {id:66,cat:"Feeding Essentials",name:"Bottle warmer",t:"",qty:,price:"",desc:"Buat ASI",links:[],pre:false},
+    {id:41,cat:"Feeding Essentials",name:"Bottle sterilizer",t:"before",qty:1,price:"Rp900,000",desc:"Norge 4 in 1 Table Top UV Sterilizer 28L",links:[{label:"Option 1 — Tokopedia",url:"https://www.tokopedia.com/hellobabyofficial/norge-4in1-table-top-uv-sterilizer-dish-dryer-28-l"},{label:"Option 2 — Shopee",url:"https://s.shopee.co.id/5q3QUujWDE"}],pre:true},
+    {id:42,cat:"Feeding Essentials",name:"Breast Milk Cooler",t:"good",qty:1,price:"Rp1,010,000",desc:"Momabae Breast Milk Cooler Portable",links:[{label:"Shopee",url:"https://shopee.co.id/Momabae-Breast-Milk-Cooler-Portable-Termos-Asi-Cooler-Asi-Ice-Gel-Asi-Kulkas-Asi-i.31628700.54153984842"}],pre:false},
+    {id:74,cat:"Feeding Essentials",name:"Cooler Bag",t:"good",qty:1,price:"Rp476,000",desc:"Mamiru Mini Cooler Bag Tas ASI Premium",links:[{label:"Shopee",url:"https://shopee.co.id/Mamiru-Mini-Cooler-Bag-Tas-ASI-Premium-Tas-Penyimpanan-ASI-i.1048437598.43168053631"}],pre:false},
+    // HEALTH
+    {id:43,cat:"Health",name:"Baby Nose Cleaner / Nasal Aspirator",t:"good",qty:1,price:"Rp331,000",desc:"Dr. Isla",links:[{label:"Shopee",url:"https://shopee.co.id/Dr.isla-Penyedot-Ingus-Bayi-Sedot-Ingus-Bayi-Baby-Nasal-Aspirator-Alat-Elektrik-Portabel-Isi-Ulang-U94-i.638749604.15195750693"}],pre:false},
+    {id:44,cat:"Health",name:"Baby Nail Clippers",t:"before",qty:1,price:"Rp68,500",desc:"Dr. Isla",links:[{label:"Shopee",url:"https://shopee.co.id/Dr.isla-Gunting-kuku-bayi-elektrik-Fungsi-lampu-LED-Baby-Nail-Trimmer-Perlengkapan-bayi-Penyesuaian-kecepatan-empat-kecepatan-dengan-kebisingan-rendah-BYM03-i.1425788536.42552530725"}],pre:true},
+    {id:45,cat:"Health",name:"First aid kit",t:"",qty:1,price:"",desc:"",links:[],pre:false},
+    {id:46,cat:"Health",name:"Cradle cap brush",t:"",qty:1,price:"",desc:"",links:[],pre:false},
+    {id:47,cat:"Health",name:"Pacifiers",t:"",qty:1,price:"",desc:"",links:[],pre:false},
+    {id:48,cat:"Health",name:"Baby toothbrush",t:"",qty:1,price:"",desc:"",links:[],pre:false},
+    // GEAR
+    {id:49,cat:"Gear",name:"Bugaboo Dragonfly",t:"before",qty:1,price:"Rp6,000,000",desc:"Preloved",links:[],pre:true},
+    {id:50,cat:"Gear",name:"Car seat",t:"before",qty:1,price:"Rp3,499,000",desc:"Joie Chili Spin 360 / Cozy n Safe Comet+ i-Size",links:[{label:"Option 1 — Tokopedia",url:"https://www.tokopedia.com/narrababy/carseat-joie-chili-spin-360-rotating-convertible-car-seat-latch-and-vehicle-belt-installation-1731510599423985423"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/Cozy-n-Safe-Comet-i-Size-Child-Car-Seat-Graphite-Dudukan-Kursi-Mobil-Bayi-Anak-i.61516207.50900741561"}],pre:true},
+    {id:51,cat:"Gear",name:"Baby Carrier Mini Sling",t:"wait",qty:1,price:"Rp699,000",desc:"Mini Monkey Sling Black",links:[{label:"Shopee",url:"https://shopee.co.id/Mini-Monkey-Mini-Sling-Gendongan-Bayi-Ringan-i.824023.11954219309"}],pre:false},
+    {id:64,cat:"Gear",name:"Baby Carrier Ergobaby",t:"wait",qty:1,price:"Rp3,399,000",desc:"Ergobaby Omni Deluxe / Ergobaby Aerloom",links:[{label:"Option 1 — Shopee",url:"https://shopee.co.id/Ergobaby-Omni-Deluxe-All-in-One-Mesh-Baby-Carrier-Pearl-Grey-Gendongan-Bayi-i.34286955.24893101138"},{label:"Option 2 — Shopee",url:"https://shopee.co.id/Ergobaby-Aerloom-Baby-Carrier-i.346049044.44851906575"}],pre:false},
+    {id:53,cat:"Gear",name:"Baby swing / bouncer",t:"wait",qty:,price:"",desc:"",links:[],pre:false},
+    // PLAYTIME
+    {id:54,cat:"Playtime",name:"Sensory Program",t:"good",qty:1,price:"Rp1,708,000",desc:"Learning Time Sensory Program 0-6 bulan",links:[{label:"Shopee",url:"https://shopee.co.id/Learning-Time-Program-Sensory-Mainan-stimulasi-bayi-0-6-bulan-Mainan-Tummy-Time-Bayi-Mainan-newborn-Paket-Stimulasi-bayi-newborn-i.117738746.24539324183"}],pre:false},
+    {id:55,cat:"Playtime",name:"Play mat",t:"wait",qty:1,price:"Rp159,000",desc:"KISUBO XPE Playmat Fold Motif C 120x180cm",links:[{label:"Shopee",url:"https://shopee.co.id/KISUBO-XPE-Playmat-Fold-and-Roll-New-Series-Playmat-Lipat-dan-Gulung-i.1020394027.22161543884"}],pre:false},
+    {id:75,cat:"Playtime",name:"Sensory Mat",t:"good",qty:1,price:"Rp322,000",desc:"Foxandbunny Baby Sensory Mat",links:[{label:"Shopee",url:"https://shopee.co.id/Foxandbunny-Baby-Sensory-Mat-Series-Winter-dan-Autumn-Matras-Bayi-untuk-Tummy-Time-i.9154240.23818848162"}],pre:false},
+    {id:76,cat:"Playtime",name:"Play mat roll",t:"good",qty:1,price:"Rp1,543,500",desc:"Parklon PVC Roll Playmat 130x190 / 140x230 cm",links:[{label:"Shopee",url:"https://shopee.co.id/Parklon-PVC-Roll-Playmat-130x190-140x230-cm-Double-Side-Matras-Karpet-Lantai-Bayi-Korea-Matras-Bayi-Bayi-Playmat-Karpet-Lantai-i.56768981.921872641"}],pre:false},
+    {id:56,cat:"Playtime",name:"Crib mobile",t:"",qty:,price:"",desc:"",links:[],pre:false},
+    {id:57,cat:"Playtime",name:"Teething toys",t:"",qty:,price:"",desc:"",links:[],pre:false},
+    {id:58,cat:"Playtime",name:"Portable pack and play",t:"",qty:,price:"",desc:"",links:[],pre:false},
+    {id:59,cat:"Playtime",name:"Stroller toys",t:"",qty:,price:"",desc:"",links:[],pre:false},
+    // POSTPARTUM
+    {id:60,cat:"Postpartum Essentials",name:"Postpartum Corset",t:"before",qty:1,price:"Rp1,132,000",desc:"",links:[{label:"Tokopedia",url:"https://tk.tokopedia.com/ZSmfxDxvY/"}],pre:true},
+    {id:77,cat:"Postpartum Essentials",name:"Maternity Pads",t:"before",qty:1,price:"Rp38,000",desc:"",links:[],pre:true},
+  ];
+
+  const CAT_ICON = {"Wardrobe":"👕","Baby Nursery":"🛏️","Bath Essentials":"🛁","Feeding Essentials":"🍼","Health":"❤️","Gear":"🚼","Playtime":"🧸","Postpartum Essentials":"💪"};
+
+  function getStatus(item) {
+    if (item.pre) return 'purchased';
+    return itemStatus[item.id] || null;
+  }
+
+  function render() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const cats = {};
+    let total = 0, needed = 0, claimed = 0;
+
+    const sortedItems = [...ITEMS].sort((a, b) => {
+      const aS = getStatus(a); const bS = getStatus(b);
+      const aDone = aS === 'purchased' || aS === 'claimed';
+      const bDone = bS === 'purchased' || bS === 'claimed';
+      return aDone === bDone ? 0 : (aDone ? 1 : -1);
+    });
+    sortedItems.forEach(item => {
+      const status = getStatus(item);
+      const isClaimed = status === 'claimed' || status === 'purchased';
+      let show = true;
+      if (q && !item.name.toLowerCase().includes(q) && !item.desc.toLowerCase().includes(q) && !item.cat.toLowerCase().includes(q)) show = false;
+      if (activeF === 'needed' && isClaimed) show = false;
+      if (activeF === 'claimed' && !isClaimed) show = false;
+      if (!show) return;
+      if (!cats[item.cat]) cats[item.cat] = [];
+      cats[item.cat].push(item);
+      total++;
+      if (isClaimed) claimed++; else needed++;
+    });
+
+    document.getElementById('hv-total').textContent = total;
+    document.getElementById('hv-needed').textContent = needed;
+    document.getElementById('hv-claimed').textContent = claimed;
+
+    const reg = document.getElementById('registry');
+    if (!Object.keys(cats).length) { reg.innerHTML = '<p class="no-results">No items match your search.</p>'; return; }
+
+    reg.innerHTML = Object.entries(cats).map(([cat, items]) => `
+      <section class="cat-section">
+        <div class="cat-header">
+          <span class="cat-icon">${CAT_ICON[cat] || ''}</span>
+          <h2 class="cat-title">${cat}</h2>
+          <span class="cat-count">${items.length} item${items.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="grid">
+          ${items.map(item => {
+            const status = getStatus(item);
+            const isClaimed = status === 'claimed' || status === 'purchased';
+            const multi = item.links.length > 1;
+            const linksHtml = item.links.length === 0 ? '' :
+              multi
+                ? `<div class="links-group"><span class="links-label">Options</span>${item.links.map(l => `<a class="item-link" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('')}</div>`
+                : `<a class="item-link" href="${item.links[0].url}" target="_blank" rel="noopener">View on ${item.links[0].label} ↗</a>`;
+
+            const badgeHtml = status === 'purchased'
+              ? `<span class="badge badge-purchased">✓ ${item.pre ? 'Already purchased' : 'Purchased'}</span>`
+              : status === 'claimed'
+              ? `<span class="badge badge-claimed">🎁 Claimed</span>`
+              : '';
+
+            const adminActionsHtml = isAdmin && !item.pre ? `
+              <div class="admin-actions">
+                <button class="mark-btn ${status === 'claimed' ? 'unmark-btn' : 'mark-claimed-btn'}"
+                  onclick="markItem(${item.id},'claimed')">
+                  ${status === 'claimed' ? '✕ Unmark claimed' : '🎁 Mark claimed'}
+                </button>
+                <button class="mark-btn ${status === 'purchased' ? 'unmark-btn' : 'mark-purchased-btn'}"
+                  onclick="markItem(${item.id},'purchased')">
+                  ${status === 'purchased' ? '✕ Unmark purchased' : '✓ Mark purchased'}
+                </button>
+              </div>` : '';
+
+            const guestActionHtml = !isAdmin && !item.pre && !isClaimed
+              ? `<button class="claim-btn" onclick="openWAModal(${item.id})">${WA_SVG}Claim via WhatsApp</button>`
+              : '';
+
+            return `
+            <div class="card${item.pre || status === 'purchased' ? ' pre-purchased' : ''}${status === 'claimed' ? ' status-claimed' : ''}${!item.price ? ' no-price' : ''}">
+              <p class="item-name">${item.name}</p>
+              ${item.desc ? `<p class="item-desc">${item.desc}</p>` : ''}
+              <div class="item-meta">
+                ${item.price ? `<span class="item-price">${item.price}</span>` : '<span class="item-price" style="font-size:11px;color:#B0ABA7;font-weight:300">Price TBD</span>'}
+                ${item.qty > 1 ? `<span class="item-qty">×${item.qty}</span>` : ''}
+              </div>
+              <div class="item-actions">
+                ${linksHtml}
+                ${badgeHtml}
+                ${adminActionsHtml}
+                ${guestActionHtml}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </section>
+    `).join('');
+  }
+
+  // Initial load
+  loadStatuses();
+</script>
+</body>
+</html>
